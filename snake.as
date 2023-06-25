@@ -161,7 +161,6 @@ Timer: PUSH R1
 	CMP R1, LEFT_KEY
 	CALL.Z MoveSnakeToLeft
 
-
 	CALL StartTimer
 
 	POP R3
@@ -247,7 +246,6 @@ PrintWin: PUSH R1
 		POP R1
 
 	RET
-
 
 ;------------------------------------------------------------------------------
 ; Rotina PrintLose: Print the lose screen
@@ -387,7 +385,6 @@ MoveSnakeUp: PUSH R1
 
 	RET
 
-
 ;------------------------------------------------------------------------------
 ; Rotina MoveSnakeDown: Moves the snake down
 ;------------------------------------------------------------------------------
@@ -423,7 +420,6 @@ MoveSnakeDown: PUSH R1
 	POP R1
 
 	RET
-
 
 ;------------------------------------------------------------------------------
 ; Rotina OnUpKeyPressed: Sets the KeyPressed variable to be UP_KEY
@@ -604,7 +600,6 @@ SnakeAteFood: PUSH R1
 		
 	RET
 
-
 ;------------------------------------------------------------------------------
 ; Rotina PushHead: Inserts at the head of the deque
 ;------------------------------------------------------------------------------
@@ -627,7 +622,7 @@ PushHead: PUSH R1
 	RET
 
 ;------------------------------------------------------------------------------
-; Rotina PopBack: Removes the end of the deque
+; Rotina PopBack: Removes the end of the deque and shifts it to the left
 ;------------------------------------------------------------------------------
 PopTail: PUSH R1
 	PUSH R2
@@ -639,44 +634,49 @@ PopTail: PUSH R1
 	MOV R1, M[ DequeTailAddr ]
 	MOV R2, M[ DequeTailAddr ]
 
+	; R1 will point to the first line before the tail
 	INC R1
 	INC R1
 	INC R1
+
+	; R2 will point to the first column before the tail
 	INC R2
 	INC R2
 
-	; MOV R3, M[ R1 ]
-	; MOV R4, M[ R2 ]
-	; MOV R5, M[ DequeTailAddr ]
-	; MOV R5, M[ R5 ]
-
-
+	; Loop to copy elements from the head until the tail
 	PopTailLoop: CMP R2, M[ DequeHead ]
 		JMP.Z EndPopTailLoop
+
+		; Getting the values to copy
 		MOV R3, M[ R1 ]
 		MOV R4, M[ R2 ]
-		
+
+		; Pointer to where to copy
 		MOV R5, R1
 		MOV R6, R2
 		
+		; Moving pointer to where to copy
 		DEC R5
 		DEC R5
 		DEC R6
 		DEC R6
 
+		; Copying numbers
 		MOV M[ R5 ], R3
 		MOV M[ R6 ], R4
 
-
+		; Moving to the next line
 		INC R1
 		INC R1
 
+		; Moving to the next column
 		INC R2
 		INC R2
 		JMP PopTailLoop
 
 	EndPopTailLoop: NOP
 
+	; Moving head to the correct position
 	DEC M[ DequeHead ]
 	DEC M[ DequeHead ]
 
@@ -687,7 +687,6 @@ PopTail: PUSH R1
 	POP R2
 	POP R1
 	RET
-
 
 ;------------------------------------------------------------------------------
 ; Rotina EraseTail: Erases the tail of the snake
@@ -739,15 +738,15 @@ PrintLine:	PUSH R1
 			MOV R1, M[ NumberLineToPrintLine ]
 			INC R1
 			MOV M[ NumberLineToPrintLine ], R1
-			CMP R1, COL_SIZE
-			JMP.NZ PrintLineLoop1
+
+		CMP R1, COL_SIZE
+		JMP.NZ PrintLineLoop1
 
 	POP R4
 	POP R3
 	POP R2
 	POP R1
 	RET
-
 
 ;------------------------------------------------------------------------------
 ; Rotina PrintMap: Prints the game grid
@@ -795,10 +794,8 @@ PrintSnake: PUSH R1
 		POP R3
 		POP R2
 		POP R1
-		
+
 	RET
-
-
 
 ;------------------------------------------------------------------------------
 ; Rotina StartTimer: Init the timer
@@ -812,7 +809,6 @@ StartTimer:	PUSH R1
 	POP R1
 	RET
 
-
 ;------------------------------------------------------------------------------
 ; Função: RandomV1 (versão 1)
 ;
@@ -820,7 +816,6 @@ StartTimer:	PUSH R1
 ; Entradas: M[Random_Var]
 ; Saidas:   M[Random_Var]
 ;------------------------------------------------------------------------------
-
 RandomV1: PUSH	R1
 	MOV	R1, LSB_MASK
 	AND	R1, M[Random_Var] ; R1 = bit menos significativo de M[Random_Var]
@@ -837,10 +832,10 @@ RandomV1: PUSH	R1
 ; Função Main
 ;------------------------------------------------------------------------------
 Main: ENI
-	MOV		R1, INITIAL_SP
-	MOV		SP, R1		 		; We need to initialize the stack
-	MOV		R1, CURSOR_INIT		; We need to initialize the cursor 
-	MOV		M[ CURSOR ], R1		; with value CURSOR_INIT
+	MOV R1, INITIAL_SP
+	MOV	SP, R1 ; We need to initialize the stack
+	MOV	R1, CURSOR_INIT ; We need to initialize the cursor 
+	MOV	M[ CURSOR ], R1 ; with value CURSOR_INIT
 
 	; Init snake head
 	MOV R1, DequeTail
@@ -860,7 +855,6 @@ Main: ENI
 	; Start Mapper and print the grid
 	CALL StartTimer
 	CALL PrintMap
-
 
 Cycle: BR Cycle	
 Halt: BR Halt
