@@ -104,6 +104,7 @@ FoodCol   WORD 41d
 
 KeyPressed WORD 1d
 
+; Parameters of PushHead
 DequeLineArg WORD 0d
 DequeColArg  WORD 0d
 
